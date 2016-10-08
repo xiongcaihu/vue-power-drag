@@ -1,0 +1,28 @@
+.container
+{
+    font-size: 0;
+
+    position: relative;
+
+    width: e("calc(100% - 20px)");
+    height: 500px;
+    margin: 10px;
+
+    border: 1px dashed;
+    & > *
+    {
+        margin: 0;
+    }
+    .item
+    {
+        font-size: 14px;
+
+        position: absolute;
+
+        overflow: hidden;
+
+        vertical-align: top;
+
+        background-color: #837878;
+    }
+}
