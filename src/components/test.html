@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>拖拽和缩放范例</title>
+  <style>
+    .container {
+      position: absolute;
+      width: 900px;
+      height: 500px;
+      top: 800px;
+      left: 200px;
+      border: 1px solid;
+      margin-bottom: 500px;
+      box-shadow: 0 0 10px;
+    }
+    
+    .item {
+      width: 100px;
+      height: 100px;
+      background-color: #666666;
+      position: absolute;
+      cursor: move;
+    }
+    
+    .resizeHandle {
+      position: absolute;
+      bottom: 1px;
+      right: 1px;
+      width: 0;
+      height: 0;
+      border-bottom: 10px solid white;
+      border-left: 10px solid transparent;
+      cursor: nw-resize;
+    }
+
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="item">
+      <span class="resizeHandle"></span>
+    </div>
+  </div>
+</body>
+<script>
+  //拖动
+  var container = document.querySelector(".container");
+  var startX, startY, start = false,
+    nowItem, orignX, orignY;
+  var resizeStart, orignWidth, orignHeight;
+
+  container.onmousedown = function (e) {}
+  container.onmouseup = function (e) {
+    start = false;
+    resizeStart = false;
+  }
+  container.onmousemove = function (e) {
+    if (start) {
+      nowItem.style.left = orignX + (e.clientX - startX) + "px";
+      nowItem.style.top = orignY + (e.clientY - startY) + "px";
+    }
+
+    if (resizeStart) {
+      nowItem.style.width = orignWidth + (e.clientX - startX) + "px";
+      nowItem.style.height = orignHeight + (e.clientY - startY) + "px";
+    }
+  }
+
+  var items = document.querySelectorAll(".container .item");
+
+  items.forEach(function (item) {
+    item.onmousedown = function (e) {
+      nowItem = e.target;
+      startX = e.clientX;
+      startY = e.clientY;
+      orignX = nowItem.offsetLeft;
+      orignY = nowItem.offsetTop;
+      if (nowItem.className == "resizeHandle") {
+        nowItem = nowItem.offsetParent;
+        resizeStart = true;
+        orignWidth = nowItem.offsetWidth;
+        orignHeight = nowItem.offsetHeight;
+      } else {
+        start = true;
+      }
+    }
+
+    item.onmouseup = function (e) {
+
+    }
+  });
+
+</script>
+
+</html>

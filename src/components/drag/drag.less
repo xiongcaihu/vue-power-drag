@@ -1,0 +1,117 @@
+.dragAndResize
+{
+    position: relative;
+
+    height: 2000px;
+
+    user-select: none;
+
+    // border: 1px solid;
+
+    *
+    {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    .item
+    {
+        position: absolute;
+
+        width: 100px;
+        height: 100px;
+
+        cursor: move;
+
+        border: 1px solid;
+        background-color: #fff;
+
+        .resizeHandle
+        {
+            position: absolute;
+            right: 2px;
+            bottom: 2px;
+
+            width: 0;
+            height: 0;
+
+            border-bottom: 10px solid black;
+            border-left: 10px solid transparent;
+
+            cursor:nw-resize;
+        }
+    }
+
+    .mask
+    {
+        display: flex;
+
+        width: 100%;
+        height: 100%;
+
+        justify-content: center;
+        align-items: center;
+
+        .thing
+        {
+            width: 50px;
+            height: 50px;
+
+            animation: loading 1s linear infinite forwards;
+
+            border: 1px dashed;
+        }
+    }
+
+    .cloneNode
+    {
+        z-index: 9999999;
+    }
+
+    .movingItem
+    {
+        position: relative;
+        &:before
+        {
+            position: absolute;
+            z-index: 1;
+            top: 0;
+            left: 0;
+
+            width: 100%;
+            height: 100%;
+
+            content: '';
+
+            background-color: red;
+        }
+    }
+
+    .positionBox
+    {
+        position: fixed;
+        top: 100px;
+        right: 100px;
+
+        overflow: hidden;
+
+        width: 300px;
+        height: 200px;
+
+        border: 1px solid;
+    }
+}
+
+@keyframes loading
+{
+    from
+    {
+        transform: rotate(0);
+    }
+    to
+    {
+        transform: rotate(90deg);
+    }
+}
+
