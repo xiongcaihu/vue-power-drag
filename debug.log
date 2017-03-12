@@ -5,3 +5,5 @@
 [0225/104840:ERROR:crash_report_exception_handler.cc(98)] WriteEverything failed
 [0225/104840:ERROR:scoped_process_suspend.cc(38)] NtResumeProcess: 已尝试访问正在退出的过程。  (0xc000010a)
 [0312/160554.165:ERROR:exception_handler_server.cc(524)] ConnectNamedPipe: 管道正在被关闭。 (0xE8)
+[0312/203125.230:ERROR:exception_handler_server.cc(524)] ConnectNamedPipe: 管道正在被关闭。 (0xE8)
+[0312/235448.702:ERROR:exception_handler_server.cc(524)] ConnectNamedPipe: 管道正在被关闭。 (0xE8)

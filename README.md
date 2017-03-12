@@ -1,6 +1,6 @@
-# vue-gridster-Cy
+# vue-gridster-cy
 
-> 基于vue2.x的拖动缩放组件，可嵌套子组件，作者Cy
+> 基于vue2.x的拖动缩放组件，可嵌套子组件，作者cy
 
 ## Build Setup
 
