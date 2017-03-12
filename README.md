@@ -1,30 +1,13 @@
-# cy2
+# vue-gridster-Cy
 
-> A Vue.js project
+> 基于vue2.x的拖动缩放组件，可嵌套子组件，作者Cy
 
 ## Build Setup
 
 ``` bash
-# install dependencies
-npm install
+# 根据自己网络情况选择,cnpm怎么用请自行百度
+npm install or cnpm install
 
 # serve with hot reload at localhost:8080
 npm run dev
 
-# build for production with minification
-npm run build
-
-# build for production and view the bundle analyzer report
-npm run build --report
-
-# run unit tests
-npm run unit
-
-# run e2e tests
-npm run e2e
-
-# run all tests
-npm test
-```
-
-For detailed explanation on how things work, checkout the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
