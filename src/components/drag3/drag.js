@@ -1,8 +1,6 @@
 import _ from "lodash"
 import $ from "jquery"
 
-let startDrag=false;
-
 export default {
     props: {
         yourList: {
@@ -106,9 +104,7 @@ export default {
             this.infoBox.startY = e.clientY;
         },
         startMove(e, item, index) {
-            startDrag=true;
             e.preventDefault();
-            return;
             let target = $(e.target);
 
             if (!this.infoBox) {
@@ -140,7 +136,6 @@ export default {
             this.infoBox.orignHeight = this.infoBox.cloneItem.height();
         },
         endMove(e) {
-            return;
             if (this.infoBox.cloneItem) {
                 this.infoBox.cloneItem.remove();
             }
@@ -148,10 +143,8 @@ export default {
                 this.infoBox.nowItemNode.removeClass("movingItem");
             }
             this.infoBox = null;
-            startDrag=false;
         },
         moving(e) {
-            return;
             let moveItem = _.get(this.infoBox, "moveItem");
             let resizeItem = _.get(this.infoBox, "resizeItem");
             if (resizeItem) { //调整大小时
@@ -172,10 +165,10 @@ export default {
                 let addSizey = nowY - resizeItem.y - resizeItem.sizey + 1;
 
                 if (Math.abs(addSizex) >= 1 || Math.abs(addSizey) >= 1) {
-                    // this.resizeItem(resizeItem, nowItemIndex, {
-                    //     sizex: resizeItem.sizex + addSizex,
-                    //     sizey: resizeItem.sizey + addSizey
-                    // });
+                    this.resizeItem(resizeItem, nowItemIndex, {
+                        sizex: resizeItem.sizex + addSizex,
+                        sizey: resizeItem.sizey + addSizey
+                    });
                 }
 
                 let nowWidth = orignWidth + moveXSize;
@@ -203,10 +196,10 @@ export default {
                 let nowX = Math.round(moveXSize / this.cellWidth);
                 let nowY = Math.round(moveYSize / this.cellHeight);
 
-                // this.customMoveItem(moveItem, nowItemIndex, {
-                //     x: parseInt(oldX + nowX),
-                //     y: parseInt(oldY + nowY)
-                // })
+                this.customMoveItem(moveItem, nowItemIndex, {
+                    x: parseInt(oldX + nowX),
+                    y: parseInt(oldY + nowY)
+                })
 
                 cloneItem.css({
                     left: orignX + moveXSize + 'px',
@@ -344,19 +337,13 @@ export default {
          * @param {any} item 
          */
         addItem(item, index) {
-            let vm = this;
             let copyItem = _.cloneDeep(item);
             this.list.push(copyItem);
             copyItem._dragId = index;
             copyItem.topItems = {}; //顶部关联元素
             copyItem.downItems = {}; //底部关联元素
 
-            // this.moveItem(copyItem, copyItem._dragId);
-        },
-        destroyAllItems() {
-            _.forEach(this.list, function (item, index) {
-                clearInterval(item.timeid);
-            });
+            this.moveItem(copyItem, copyItem._dragId);
         },
         /**
          * 寻找重叠元素
@@ -431,7 +418,7 @@ export default {
                 for (let i = 0; i < itemIndexs.length; i++) {
                     let index = itemIndexs[i];
                     let nowItem = this.list[index];
-                    goDownItems[index] = index;
+                    goDownItems[index]=index;
                     _.merge(goDownItems, this.collectNeedMoveDownItems(nowItem));
                 }
             }
@@ -521,38 +508,31 @@ export default {
          * @param {any} item 
          */
         searchTopAndDownConnectItem(item) {
-            item.topItems = {}
+            item.topItems={}
             //上边关联元素
             for (var i = item.x - 1; i < item.x - 1 + item.sizex; i++) {
                 var y = item.y - 2;
-                if (y < 0) {
+                if(y<0){
                     break;
                 }
-                let cItemIndex = this.getPositionBoxIndex(y, i);
-                let cItem = this.list[cItemIndex];
-                if (cItemIndex != -1) {
-                    item.topItems[cItemIndex] = cItemIndex;
-                    cItem.downItems[item._dragId] = item._dragId;
+                let cItemIndex=this.getPositionBoxIndex(y, i);
+                let cItem=this.list[cItemIndex];
+                if(cItemIndex!=-1){
+                    item.topItems[cItemIndex]=cItemIndex;
+                    cItem.downItems[item._dragId]=item._dragId;
                 }
             }
 
-            item.downItems = {}
+            item.downItems={}
             //下边关联元素
             for (var i = item.x - 1; i < item.x - 1 + item.sizex; i++) {
-                var y = item.y - 1 + item.sizey;
-                let cItemIndex = this.getPositionBoxIndex(y, i);
-                let cItem = this.list[cItemIndex];
-                if (cItemIndex != -1) {
-                    item.downItems[cItemIndex] = cItemIndex;
-                    cItem.topItems[item._dragId] = item._dragId;
+                var y = item.y -1 + item.sizey;
+                let cItemIndex=this.getPositionBoxIndex(y, i);
+                let cItem=this.list[cItemIndex];
+                if(cItemIndex!=-1){
+                    item.downItems[cItemIndex]=cItemIndex;
+                    cItem.topItems[item._dragId]=item._dragId;
                 }
-            }
-        },
-        checkItemOverlay(e,item,index){
-            e.preventDefault();
-            console.log("kjfd")
-            if(startDrag){
-                
             }
         },
         /**
