@@ -1,6 +1,5 @@
 <template>
     <div class='dragAndResize' ref='container' @mousedown="containerMouseDown($event)" @mouseup="endMove($event)" @mousemove="moving($event)">
-        <button @click="destroyAllItems()">stopAll</button>
         <div class="mask" v-if="!renderOk">
             <span class="thing"></span>
         </div>
