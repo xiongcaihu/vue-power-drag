@@ -7,7 +7,7 @@
             <slot :name="'slot'+index"></slot>
             <span class="resizeHandle" @mousedown="startResize($event,item,index)"></span>
         </div>
-        <div class="positionBox">
+        <!--<div class="positionBox">
             <table border="1">
                 <thead>
                     <tr>
@@ -26,7 +26,7 @@
                     </tr>
                 </tbody>
             </table>
-        </div>
+        </div>-->
     </div>
 </template>
 

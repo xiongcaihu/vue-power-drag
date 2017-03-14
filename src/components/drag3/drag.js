@@ -79,7 +79,8 @@ export default {
             if (this.positionBox[row][cell] == null) {
                 this.fillEmptyPositionBox(j, i);
             }
-            return _.get(this, "positionBox[" + row + "][" + cell + "].index");
+            // return _.get(this, "positionBox[" + row + "][" + cell + "].index");
+            return this.positionBox[row][cell].index;
         },
         startResize(e, item, index) {
             e.preventDefault();
@@ -231,7 +232,11 @@ export default {
             _.forEach(this.yourList, function (item, index) {
                 // item._dragId = index;
                 // vm.moveItem(item, index);
-                vm.addItem(item, index);
+                setTimeout((function (item, index) {
+                    return function () {
+                        vm.addItem(item, index);
+                    }
+                })(item, index), 300);
             })
 
             vm.renderOk = true;
@@ -411,18 +416,20 @@ export default {
          * @param {any} item 
          * @param {any} array 
          */
-        collectNeedMoveDownItems(item) {
-            let goDownItems = {};
-            let itemIndexs = _.keys(item.downItems);
-            if (!_.isEmpty(itemIndexs)) {
-                for (let i = 0; i < itemIndexs.length; i++) {
-                    let index = itemIndexs[i];
-                    let nowItem = this.list[index];
-                    goDownItems[index]=index;
-                    _.merge(goDownItems, this.collectNeedMoveDownItems(nowItem));
-                }
+        collectNeedMoveDownItems(item,goDownItems) {
+            // let itemIndexs = _.keys(item.downItems);
+            for (let key in item.downItems) {
+                let index = key;
+                let nowItem = this.list[index];
+                goDownItems[index] = index;
+                this.collectNeedMoveDownItems(nowItem,goDownItems);
             }
-            return goDownItems;
+            // for (let i = 0; i < itemIndexs.length; i++) {
+            //     let index = itemIndexs[i];
+            //     let nowItem = this.list[index];
+            //     goDownItems[index] = index;
+            //     _.merge(goDownItems, this.collectNeedMoveDownItems(nowItem));
+            // }
             // for (let i = item.x - 1; i < item.x - 1 + item.sizex; i++) {
             //     let j = item.y + item.sizey - 1;
             //     // let itemIndex = this.positionBox[j][i].index;
@@ -435,7 +442,9 @@ export default {
             // }
         },
         collectNeedMoveUpItems(item) {
-            return this.collectNeedMoveDownItems(item);
+            let goUpItems={};
+            this.collectNeedMoveDownItems(item,goUpItems);
+            return goUpItems;
         },
         /**
          * 移动需要下移的所有元素
@@ -448,6 +457,7 @@ export default {
 
         },
         moveItemsUp(items) {
+            return;
             let vm = this;
 
             let arrayOfItems = [];
@@ -508,30 +518,30 @@ export default {
          * @param {any} item 
          */
         searchTopAndDownConnectItem(item) {
-            item.topItems={}
+            item.topItems = {}
             //上边关联元素
             for (var i = item.x - 1; i < item.x - 1 + item.sizex; i++) {
                 var y = item.y - 2;
-                if(y<0){
+                if (y < 0) {
                     break;
                 }
-                let cItemIndex=this.getPositionBoxIndex(y, i);
-                let cItem=this.list[cItemIndex];
-                if(cItemIndex!=-1){
-                    item.topItems[cItemIndex]=cItemIndex;
-                    cItem.downItems[item._dragId]=item._dragId;
+                let cItemIndex = this.getPositionBoxIndex(y, i);
+                let cItem = this.list[cItemIndex];
+                if (cItemIndex != -1) {
+                    item.topItems[cItemIndex] = cItemIndex;
+                    cItem.downItems[item._dragId] = item._dragId;
                 }
             }
 
-            item.downItems={}
+            item.downItems = {}
             //下边关联元素
             for (var i = item.x - 1; i < item.x - 1 + item.sizex; i++) {
-                var y = item.y -1 + item.sizey;
-                let cItemIndex=this.getPositionBoxIndex(y, i);
-                let cItem=this.list[cItemIndex];
-                if(cItemIndex!=-1){
-                    item.downItems[cItemIndex]=cItemIndex;
-                    cItem.topItems[item._dragId]=item._dragId;
+                var y = item.y - 1 + item.sizey;
+                let cItemIndex = this.getPositionBoxIndex(y, i);
+                let cItem = this.list[cItemIndex];
+                if (cItemIndex != -1) {
+                    item.downItems[cItemIndex] = cItemIndex;
+                    cItem.topItems[item._dragId] = item._dragId;
                 }
             }
         },
