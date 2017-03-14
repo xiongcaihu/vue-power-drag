@@ -15,13 +15,13 @@
     // 在 Highcharts 加载之后加载功能模块
     require('highcharts/modules/exporting')(Highcharts);
 
-    import drag from './components/drag3/drag.vue';
+    import drag from './components/drag4/drag.vue';
     import mock from "mockjs"
 
     export default {
         data() {
             let list = mock.mock({
-                "myList|50": [{
+                "myList|100": [{
                     "id|+1": 1,
                     "text|+1": 1,
                     x: "@integer(1,5)",

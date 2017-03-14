@@ -10,7 +10,7 @@ let positionBox = [];
 function resetPositionBox() {
     //根据当前容器的宽度来决定多少列
     let cells = parseInt(this.$refs['container'].offsetWidth / this.cellWidth);
-    let rows = 10000; //初始100行，后面根据需求会自动增加
+    let rows = 1000; //初始100行，后面根据需求会自动增加
     for (let i = 0; i < rows; i++) {
         let row = [];
 
@@ -30,6 +30,8 @@ function resetPositionBox() {
  * @param {any} item 
  */
 function addItemToPositionBox(item) {
+    if (item.x <= 0 || item.y <= 0) return;
+
     for (let i = item.x - 1; i < item.x - 1 + item.sizex; i++) {
         for (let j = item.y - 1; j < item.y - 1 + item.sizey; j++) {
             positionBox[j][i].el = item;
@@ -38,6 +40,7 @@ function addItemToPositionBox(item) {
 }
 
 function removeItemFromPositionBox(item) {
+    if (item.x <= 0 || item.y <= 0) return;
     for (let i = item.x - 1; i < item.x - 1 + item.sizex; i++) {
         for (let j = item.y - 1; j < item.y - 1 + item.sizey; j++) {
             positionBox[j][i].el = false;
@@ -52,15 +55,18 @@ function init() {
 
     resetPositionBox.call(this);
 
-    _.forEach(this.yourList, function (item, index) {
-        // item._dragId = index;
-        // vm.moveItem(item, index);
-        (function (item) {
-            setTimeout(function () {
-                addItem.call(vm, item, index);
-            }, 1);
-        })(item);
-    })
+    let length = this.yourList.length;
+    let i = 0;
+    let timeid = setInterval(function () {
+        if (i >= length) {
+            clearInterval(timeid);
+            return;
+        }
+
+        let item = vm.yourList[i]
+        addItem.call(vm, item, i);
+        i++;
+    }, 10);
 
     vm.renderOk = true;
 }
@@ -71,12 +77,13 @@ function addItem(item, index) {
     copyItem._dragId = index;
     copyItem.show = false;
 
-    let canGoUpRows = canItemGoUp(item);
-    if (canGoUpRows > 0) {
-        copyItem.y -= canGoUpRows;
-    }
-
     emptyTargetCell.call(this, copyItem);
+
+    let canGoUpRows = canItemGoUp(copyItem);
+
+    if (canGoUpRows > 0) {
+        moveItemUp(copyItem, canGoUpRows);
+    }
 
     copyItem.show = true;
 }
@@ -98,14 +105,33 @@ function emptyTargetCell(item) {
 
     _.forEach(belowItems, function (downItem, index) {
         let moveSize = item.y + item.sizey - downItem.y;
-
-        moveItemDown.call(this, downItem, moveSize);
+        if (moveSize > 0) {
+            moveItemDown.call(this, downItem, moveSize);
+        }
     })
+
+    // if (belowItems.length > 0) {
+    //     let moved=[];
+    //     for (let i = belowItems.length - 1; i >= 0; i--) {
+    //         let moveSize = item.y + item.sizey - belowItems[i].y;
+    //         if (moveSize > 0) {
+    //             moved.push(belowItems[i]);
+    //             moveItemDown.call(this, belowItems[i], moveSize,moved);
+    //         }
+    //     }
+    // }
 
     addItemToPositionBox(item);
 }
 
-function checkTargetCellOccupied(item) {
+
+/**
+ * 检查当前元素所在位置有哪些元素
+ * 
+ * @param {any} item
+ * @returns
+ */
+function getTargetCellOccupiedItems(item) {
     for (let i = item.x - 1; i < item.x - 1 + item.sizex; i++) {
         for (let j = item.y - 1; j < item.y - 1 + item.sizey; j++) {
             if (positionBox[j][i].el) {
@@ -117,6 +143,12 @@ function checkTargetCellOccupied(item) {
     return false;
 }
 
+/**
+ * 当前位置的item能否上浮
+ * 
+ * @param {any} item
+ * @returns
+ */
 function canItemGoUp(item) {
     let upperRows = 0;
     for (let row = item.y - 2; row >= 0; row--) {
@@ -144,52 +176,88 @@ function moveItemDown(item, size) {
 
     let belowItems = findBelowItems(item);
 
-    item.y += size;
-
     _.forEach(belowItems, function (downItem, index) {
-        let moveSize = item.y + item.sizey - downItem.y;
-        moveItemDown(downItem, moveSize)
+        // let moveSize = item.y + item.sizey + size - downItem.y;
+        let moveSize = calcDiff(item, downItem, size);
+        if (moveSize > 0) {
+            moveItemDown.call(this, downItem, moveSize);
+        }
     })
+
+    item.y += size;
 
     addItemToPositionBox(item);
 
     item.show = true;
 }
 
-function moveItemUp(items, size) {
-    _.forEach(items, function (item, index) {
-        let canGoUpRows = canItemGoUp(item);
-        if (canGoUpRows <= 0) {
-            return;
+/**
+ * 寻找子元素到父元素的最大距离
+ * 
+ * @param {any} parent
+ * @param {any} son
+ * @param {any} size
+ */
+function calcDiff(parent, son, size) {
+    let diffs = [];
+
+    for (let i = son.x - 1; i < son.x - 1 + son.sizex; i++) {
+        let temp_y = 0;
+
+        for (let j = parent.y - 1 + parent.sizey; j < son.y - 1; j++) {
+            if (positionBox[j][i].el == false) {
+                temp_y++;
+            }
         }
-        let belowItems = findBelowItems(item);
+        diffs.push(temp_y);
+    }
 
-        item.show = false;
-        removeItemFromPositionBox(item);
+    let max_diff = Math.max.apply(Math, diffs);
+    size = size - max_diff;
 
-        item.y -= size;
+    return size > 0 ? size : 0;
+}
 
-        addItemToPositionBox(item);
+function moveItemUp(item, size) {
+    item.show = false;
 
-        item.show = true;
+    removeItemFromPositionBox(item);
 
-        if (belowItems.length > 0) {
-            moveItemUp(belowItems, canGoUpRows);
+    let belowItems = findBelowItems(item);
+
+    item.y -= size;
+
+    addItemToPositionBox(item);
+
+    item.show = true;
+
+    _.forEach(belowItems, function (upItem, index) {
+        let moveSize = canItemGoUp(upItem);
+        if (moveSize > 0) {
+            moveItemUp(upItem, moveSize);
         }
     })
 }
 
-/**
- * item的坐标当前已经是目标位置
- * 
- * @param {any} item 
- */
 function findBelowItems(item) {
     let belowItems = [];
     for (let cell = item.x - 1; cell < item.x - 1 + item.sizex; cell++) {
-        let row = item.y +item.sizey - 1;
-        if (row > positionBox.length) break;
+        for (let row = item.y - 1; row < positionBox.length; row++) {
+            let target = positionBox[row][cell];
+            if (target.el && !_.includes(belowItems, target.el)) {
+                belowItems.push(target.el);
+                break;
+            }
+        }
+    }
 
+    return _.sortBy(belowItems, 'y');
+}
+
+function findBelowItems2(item) {
+    let belowItems = [];
+    for (let cell = item.x - 1; cell < item.x - 1 + item.sizex; cell++) {
+        let row = item.y + item.sizey - 1;
         let target = positionBox[row][cell];
         if (!_.includes(belowItems, target.el) && target.el) {
             belowItems.push(target.el);
@@ -197,6 +265,25 @@ function findBelowItems(item) {
     }
 
     return belowItems;
+}
+
+/**
+ * item的坐标当前已经是目标位置
+ * 
+ * @param {any} item 
+ */
+function findNeedDownItems(item) {
+    let belowItems = [];
+    for (let cell = item.x - 1; cell < item.x - 1 + item.sizex; cell++) {
+        for (let row = item.y - 1; row < item.y + item.sizey - 1; row++) {
+            let target = positionBox[row][cell];
+            if (!_.includes(belowItems, target.el) && target.el) {
+                belowItems.push(target.el);
+            }
+        }
+    }
+
+    return _.sortBy(belowItems, 'y');
 }
 
 export default {
@@ -237,7 +324,9 @@ export default {
         }
     },
     computed: {
-
+        positionBox() {
+            return positionBox;
+        }
     },
     methods: {
         /**
