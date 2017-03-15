@@ -3,11 +3,14 @@
         <div class="mask" v-if="!renderOk">
             <span class="thing"></span>
         </div>
-        <div v-if="renderOk && item.show" class="item" @mousedown="startMove($event,item,index)" :ref="'item'+index" v-for="(item,index) in list" :key="'item'+index" :style="nowItemStyle(item,index)">
-            <slot :name="'slot'+index"></slot>
-            <span class="resizeHandle" @mousedown="startResize($event,item,index)"></span>
+        <div v-if="renderOk">
+            <div v-show="item.show" class="item" @mousedown="startMove($event,item,index)" :ref="'item'+index" v-for="(item,index) in list"
+                :key="'item'+index" :style="nowItemStyle(item,index)">
+                <slot :name="'slot'+index"></slot>
+                <span class="resizeHandle" @mousedown="startResize($event,item,index)"></span>
+            </div>
         </div>
-        
+
         <div class="positionBox">
             <table border="1">
                 <thead>
@@ -28,7 +31,13 @@
                 </tbody>
             </table>
         </div>
-        
+
+        <div class="coords">
+            <p v-for="(item,index) in coordinates">
+                {{item.el.id}} : {{item.x1+'-'+item.x2+'-'+item.y1+'-'+item.y2}}
+            </p>
+        </div>
+
     </div>
 </template>
 

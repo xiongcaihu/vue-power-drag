@@ -1,7 +1,7 @@
 <template>
     <div id="app">
         <button @click="pirntList()">print list</button>
-        <drag :your-list="myList" :baseWidth="10" :baseHeight="5">
+        <drag :your-list="myList" :baseWidth="100" :baseHeight="50">
             <div class="chart" v-for="(item,index) in myList" :slot="'slot'+index" :ref="'chart'+index">
                 {{item.id}}
             </div>
@@ -26,12 +26,13 @@
                     "text|+1": 1,
                     x: "@integer(1,5)",
                     y: "@integer(1,5)",
-                    sizex: "@integer(10,10)",
-                    sizey: "@integer(10,10)",
+                    sizex: "@integer(1,3)",
+                    sizey: "@integer(1,3)",
                 }]
             })
             return {
                 myList: list.myList,
+                // myList:[{"id":1,"text":1,"x":3,"y":2,"sizex":3,"sizey":1},{"id":2,"text":2,"x":1,"y":1,"sizex":1,"sizey":2},{"id":3,"text":3,"x":3,"y":2,"sizex":2,"sizey":2}]
                 // myList: [
                 //     {
                 //     id: 1,

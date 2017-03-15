@@ -1,7 +1,19 @@
 import _ from "lodash"
 import $ from "jquery"
+import TWEEN from "tween.js"
 
 let positionBox = [];
+let coordinates = []; //坐标点集合
+let animate = false;
+
+let debounceId = 0;
+
+function debounce(func, time) {
+    clearTimeout(debounceId);
+    debounceId = setTimeout(function () {
+        func();
+    }, 20);
+}
 
 /**
  * 重置位置盒子
@@ -10,7 +22,7 @@ let positionBox = [];
 function resetPositionBox() {
     //根据当前容器的宽度来决定多少列
     let cells = parseInt(this.$refs['container'].offsetWidth / this.cellWidth);
-    let rows = 1000; //初始100行，后面根据需求会自动增加
+    let rows = 1200; //初始100行，后面根据需求会自动增加
     for (let i = 0; i < rows; i++) {
         let row = [];
 
@@ -55,37 +67,211 @@ function init() {
 
     resetPositionBox.call(this);
 
+    // _.forEach(this.yourList,function(item,index){
+    //     addItem.call(vm,item,index);
+    // })
+
     let length = this.yourList.length;
     let i = 0;
     let timeid = setInterval(function () {
         if (i >= length) {
             clearInterval(timeid);
+            animate = true;
             return;
         }
 
         let item = vm.yourList[i]
         addItem.call(vm, item, i);
         i++;
-    }, 10);
+    }, 0);
 
     vm.renderOk = true;
+    vm.$nextTick(function () {
+        
+    })
+}
+
+function resizePlayer(item, newSize) {
+    let vm = this;
+    removeItemFromPositionBox(item);
+
+    let belowItems = findBelowItems.call(this, item);
+
+    _.forEach(belowItems, function (upItem) {
+        let canGoUpRows = canItemGoUp(upItem);
+
+        if (canGoUpRows > 0) {
+            moveItemUp.call(vm, upItem, canGoUpRows);
+        }
+    })
+
+    item.sizex += newSize.sizex;
+    item.sizey += newSize.sizey;
+
+    emptyTargetCell.call(this, item);
+
+    addItemToPositionBox(item);
+
+    changeItemCoord.call(this, item);
+
+    let canGoUpRows = canItemGoUp(item);
+
+    if (canGoUpRows > 0) {
+        moveItemUp.call(this, item, canGoUpRows);
+    }
+}
+
+/**
+ * 移动正在拖动的元素
+ * 
+ * @param {any} item
+ * @param {any} position
+ */
+function movePlayer(item, position) {
+    let vm = this;
+    removeItemFromPositionBox(item);
+
+    let belowItems = findBelowItems.call(this, item);
+
+    _.forEach(belowItems, function (upItem) {
+        let canGoUpRows = canItemGoUp(upItem);
+        if (canGoUpRows > 0) {
+            moveItemUp.call(vm, upItem, canGoUpRows);
+        }
+    })
+
+    item.x = position.x;
+    item.y = position.y;
+
+    emptyTargetCell.call(this, item);
+
+    addItemToPositionBox(item);
+
+    changeItemCoord.call(this, item);
+
+    let canGoUpRows = canItemGoUp(item);
+
+    if (canGoUpRows > 0) {
+        moveItemUp.call(this, item, canGoUpRows);
+    }
+}
+
+function removeItem(item) {
+    removeItemFromPositionBox(item);
+
+    let belowItems = findBelowItems(item);
+
+    this.list.splice(item._dragId, 1);
+
+    _.forEach(belowItems, function (upItem) {
+        let canGoUpRows = canItemGoUp(upItem);
+
+        if (canGoUpRows > 0) {
+            moveItemUp.call(this, upItem, canGoUpRows);
+        }
+    })
+
 }
 
 function addItem(item, index) {
     let copyItem = _.cloneDeep(item);
-    this.list.push(copyItem);
+    this.list.splice(index, 0, copyItem);
     copyItem._dragId = index;
     copyItem.show = false;
 
     emptyTargetCell.call(this, copyItem);
 
+    addItemToPositionBox(copyItem);
+
     let canGoUpRows = canItemGoUp(copyItem);
 
     if (canGoUpRows > 0) {
-        moveItemUp(copyItem, canGoUpRows);
+        moveItemUp.call(this, copyItem, canGoUpRows);
     }
 
     copyItem.show = true;
+
+    //生成坐标点
+    makeCoordinate.call(this, copyItem);
+}
+
+function changeToCoord(left, top, width, height) {
+    return {
+        x1: left,
+        x2: left + width,
+        y1: top,
+        y2: top + height,
+        c1: left + width / 2,
+        c2: top + height / 2,
+    }
+}
+
+/**
+ * 检测有无碰撞，并作出处理
+ * 
+ * @param {any} tCoord 比对对象的坐标
+ */
+function findClosetCoords(item, tCoord) {
+    let i = coordinates.length;
+    while (i--) {
+        let nowCoord = coordinates[i];
+        if (item._dragId == nowCoord.el._dragId) {
+            continue;
+        }
+
+        if (tCoord.x2 < nowCoord.x1 || tCoord.x1 > nowCoord.x2 || tCoord.y2 < nowCoord.y1 || tCoord.y1 > nowCoord.y2) {
+            continue;
+        } else {
+            console.log("coolision");
+        }
+    }
+}
+
+/**
+ * 生成坐标点
+ * 
+ * @param {any} item
+ */
+function makeCoordinate(item) {
+    let width = this.cellWidth * (item.sizex) - this.baseMarginLeft;
+    let height = this.cellHeight * (item.sizey) - this.baseMarginTop;
+    let left = this.cellWidth * (item.x - 1) + this.baseMarginLeft;
+    let top = this.cellHeight * (item.y - 1) + this.baseMarginTop;
+
+    let coord = {
+        x1: left,
+        x2: left + width,
+        y1: top,
+        y2: top + height,
+        c1: left + width / 2,
+        c2: top + height / 2,
+        el: item
+    }
+
+    coordinates.push(coord);
+}
+
+function changeItemCoord(item) {
+    let width = this.cellWidth * (item.sizex) - this.baseMarginLeft;
+    let height = this.cellHeight * (item.sizey) - this.baseMarginTop;
+    let left = this.cellWidth * (item.x - 1) + this.baseMarginLeft;
+    let top = this.cellHeight * (item.y - 1) + this.baseMarginTop;
+
+    let coord = {
+        x1: left,
+        x2: left + width,
+        y1: top,
+        y2: top + height,
+        c1: left + width / 2,
+        c2: top + height / 2,
+        el: item
+    }
+
+    let index = _.findIndex(coordinates, function (o) {
+        return o.el._dragId == item._dragId;
+    });
+
+    coordinates.splice(index, 1, coord);
 }
 
 function moveItem(item) {
@@ -101,47 +287,18 @@ function moveItem(item) {
  * @param {any} item 
  */
 function emptyTargetCell(item) {
-    let belowItems = findBelowItems.call(this, item);
+    let vm = this;
+    let belowItems = findBelowItems(item);
 
     _.forEach(belowItems, function (downItem, index) {
+        if (downItem._dragId == item._dragId) return;
         let moveSize = item.y + item.sizey - downItem.y;
         if (moveSize > 0) {
-            moveItemDown.call(this, downItem, moveSize);
+            moveItemDown.call(vm, downItem, moveSize);
         }
     })
-
-    // if (belowItems.length > 0) {
-    //     let moved=[];
-    //     for (let i = belowItems.length - 1; i >= 0; i--) {
-    //         let moveSize = item.y + item.sizey - belowItems[i].y;
-    //         if (moveSize > 0) {
-    //             moved.push(belowItems[i]);
-    //             moveItemDown.call(this, belowItems[i], moveSize,moved);
-    //         }
-    //     }
-    // }
-
-    addItemToPositionBox(item);
 }
 
-
-/**
- * 检查当前元素所在位置有哪些元素
- * 
- * @param {any} item
- * @returns
- */
-function getTargetCellOccupiedItems(item) {
-    for (let i = item.x - 1; i < item.x - 1 + item.sizex; i++) {
-        for (let j = item.y - 1; j < item.y - 1 + item.sizey; j++) {
-            if (positionBox[j][i].el) {
-                return true;
-            }
-        }
-    }
-
-    return false;
-}
 
 /**
  * 当前位置的item能否上浮
@@ -171,24 +328,39 @@ function canItemGoUp(item) {
  * @param {any} size 
  */
 function moveItemDown(item, size) {
-    item.show = false;
+    let vm = this;
     removeItemFromPositionBox(item);
 
     let belowItems = findBelowItems(item);
 
     _.forEach(belowItems, function (downItem, index) {
+        if (downItem._dragId == item._dragId) return;
         // let moveSize = item.y + item.sizey + size - downItem.y;
         let moveSize = calcDiff(item, downItem, size);
         if (moveSize > 0) {
-            moveItemDown.call(this, downItem, moveSize);
+            moveItemDown.call(vm, downItem, moveSize);
         }
     })
 
-    item.y += size;
+    // item.y += size;
+    setPlayerPosition.call(this, item, {
+        y: item.y + size
+    })
 
     addItemToPositionBox(item);
 
-    item.show = true;
+    changeItemCoord.call(this, item);
+}
+
+function setPlayerPosition(item, position) {
+    let vm = this;
+    position = position || {};
+
+    let targetX = position.x || item.x;
+    let targetY = position.y || item.y;
+
+    item.x = targetX;
+    item.y = targetY;
 }
 
 /**
@@ -219,71 +391,43 @@ function calcDiff(parent, son, size) {
 }
 
 function moveItemUp(item, size) {
-    item.show = false;
+    let vm = this;
 
     removeItemFromPositionBox(item);
 
     let belowItems = findBelowItems(item);
 
-    item.y -= size;
+    // item.y -= size;
+    setPlayerPosition.call(this, item, {
+        y: item.y - size
+    })
 
     addItemToPositionBox(item);
 
-    item.show = true;
+    changeItemCoord.call(this, item);
 
     _.forEach(belowItems, function (upItem, index) {
         let moveSize = canItemGoUp(upItem);
         if (moveSize > 0) {
-            moveItemUp(upItem, moveSize);
+            moveItemUp.call(vm, upItem, moveSize);
         }
     })
 }
 
 function findBelowItems(item) {
-    let belowItems = [];
+    let belowItems = {};
     for (let cell = item.x - 1; cell < item.x - 1 + item.sizex; cell++) {
         for (let row = item.y - 1; row < positionBox.length; row++) {
             let target = positionBox[row][cell];
-            if (target.el && !_.includes(belowItems, target.el)) {
-                belowItems.push(target.el);
+            if (target.el) {
+                // belowItems.push(target.el);
+                belowItems[target.el._dragId] = target.el;
                 break;
             }
         }
     }
 
-    return _.sortBy(belowItems, 'y');
-}
-
-function findBelowItems2(item) {
-    let belowItems = [];
-    for (let cell = item.x - 1; cell < item.x - 1 + item.sizex; cell++) {
-        let row = item.y + item.sizey - 1;
-        let target = positionBox[row][cell];
-        if (!_.includes(belowItems, target.el) && target.el) {
-            belowItems.push(target.el);
-        }
-    }
-
-    return belowItems;
-}
-
-/**
- * item的坐标当前已经是目标位置
- * 
- * @param {any} item 
- */
-function findNeedDownItems(item) {
-    let belowItems = [];
-    for (let cell = item.x - 1; cell < item.x - 1 + item.sizex; cell++) {
-        for (let row = item.y - 1; row < item.y + item.sizey - 1; row++) {
-            let target = positionBox[row][cell];
-            if (!_.includes(belowItems, target.el) && target.el) {
-                belowItems.push(target.el);
-            }
-        }
-    }
-
-    return _.sortBy(belowItems, 'y');
+    return _.sortBy(_.values(belowItems), 'y');
 }
 
 export default {
@@ -326,7 +470,10 @@ export default {
     computed: {
         positionBox() {
             return positionBox;
-        }
+        },
+        coordinates() {
+            return coordinates;
+        },
     },
     methods: {
         /**
@@ -391,7 +538,6 @@ export default {
             this.infoBox.startY = e.clientY;
         },
         startMove(e, item, index) {
-            return;
             e.preventDefault();
             let target = $(e.target);
 
@@ -422,9 +568,10 @@ export default {
             this.infoBox.oldY = item.y;
             this.infoBox.orignWidth = this.infoBox.cloneItem.width();
             this.infoBox.orignHeight = this.infoBox.cloneItem.height();
+            this.infoBox.orignOffsetX = e.offsetX;
+            this.infoBox.orignOffsetY = e.offsetY;
         },
         endMove(e) {
-            return;
             if (this.infoBox.cloneItem) {
                 this.infoBox.cloneItem.remove();
             }
@@ -434,7 +581,6 @@ export default {
             this.infoBox = null;
         },
         moving(e) {
-            return;
             let moveItem = _.get(this.infoBox, "moveItem");
             let resizeItem = _.get(this.infoBox, "resizeItem");
             if (resizeItem) { //调整大小时
@@ -455,10 +601,10 @@ export default {
                 let addSizey = nowY - resizeItem.y - resizeItem.sizey + 1;
 
                 if (Math.abs(addSizex) >= 1 || Math.abs(addSizey) >= 1) {
-                    this.resizeItem(resizeItem, nowItemIndex, {
-                        sizex: resizeItem.sizex + addSizex,
-                        sizey: resizeItem.sizey + addSizey
-                    });
+                    resizePlayer.call(this, resizeItem, {
+                        sizex: addSizex,
+                        sizey: addSizey
+                    })
                 }
 
                 let nowWidth = orignWidth + moveXSize;
@@ -483,17 +629,56 @@ export default {
                 let moveXSize = e.clientX - startX; //X方向移动的距离
                 let moveYSize = e.clientY - startY; //Y方向移动的距离
 
-                let nowX = Math.round(moveXSize / this.cellWidth);
-                let nowY = Math.round(moveYSize / this.cellHeight);
+                // let nowX = Math.round(moveXSize / this.cellWidth);
+                // let nowY = Math.round(moveYSize / this.cellHeight);
 
-                this.customMoveItem(moveItem, nowItemIndex, {
-                    x: parseInt(oldX + nowX),
-                    y: parseInt(oldY + nowY)
-                })
+                // this.customMoveItem(moveItem, nowItemIndex, {
+                //     x: parseInt(oldX + nowX),
+                //     y: parseInt(oldY + nowY)
+                // })
+
+                let nowCloneItemX = orignX + moveXSize;
+                let nowCloneItemY = orignY + moveYSize;
+
+                let newX = parseInt((nowCloneItemX + (cloneItem.width() / 4) - this.baseMarginLeft) / this.cellWidth + 1);
+                let newY = parseInt((nowCloneItemY + (cloneItem.height() / 4) - this.baseMarginTop) / this.cellHeight + 1);
+                newX = newX > 0 ? newX : 1;
+                newY = newY > 0 ? newY : 1;
+
+                // let nowCoord = changeToCoord(nowCloneItemX, nowCloneItemY, cloneItem.width(), cloneItem.height());
+                // findClosetCoords.call(this, moveItem, nowCoord);
+
+                // console.log("newX=%d,newY=%d", newX, newY);
+                let vm = this;
+                // debounce((function (newX, oldX, newY, oldY) {
+                //     return function () {
+                //         if (newX != oldX || oldY != newY) {
+                //             console.log("move");
+                //             movePlayer.call(vm, moveItem, {
+                //                 x: newX,
+                //                 y: newY
+                //             })
+
+                //             vm.infoBox.oldX = newX;
+                //             vm.infoBox.oldY = newY;
+                //         }
+                //     }
+                // })(newX, oldX, newY, oldY), 60);
+
+                if (newX != oldX || oldY != newY) {
+                    console.log("move");
+                    movePlayer.call(vm, moveItem, {
+                        x: newX,
+                        y: newY
+                    })
+
+                    vm.infoBox.oldX = newX;
+                    vm.infoBox.oldY = newY;
+                }
 
                 cloneItem.css({
-                    left: orignX + moveXSize + 'px',
-                    top: orignY + moveYSize + 'px'
+                    left: nowCloneItemX + 'px',
+                    top: nowCloneItemY + 'px'
                 })
             }
         },
@@ -504,11 +689,42 @@ export default {
          * @returns 
          */
         nowItemStyle(item, index) {
-            return {
-                width: (this.cellWidth * (item.sizex) - this.baseMarginLeft) + 'px',
-                height: (this.cellHeight * (item.sizey) - this.baseMarginTop) + 'px',
-                left: (this.cellWidth * (item.x - 1) + this.baseMarginLeft) + 'px',
-                top: (this.cellHeight * (item.y - 1) + this.baseMarginTop) + 'px'
+            let vm = this;
+            let targetNode = this.$refs['item' + item._dragId];
+            if (animate && targetNode) {
+                targetNode = $(targetNode[0]);
+                if (item.tween) {
+                    item.tween.stop()
+                }
+
+                var coords = {
+                    x: targetNode.position().left,
+                    y: targetNode.position().top
+                }
+
+                let tarCoords = {
+                    x: vm.cellWidth * (item.x - 1) + vm.baseMarginLeft,
+                    y: vm.cellHeight * (item.y - 1) + vm.baseMarginTop
+                }
+
+                targetNode.animate({
+                    left: tarCoords.x + 'px',
+                    top: tarCoords.y + 'px'
+                }, 100, "linear");
+
+                return {
+                    width: (this.cellWidth * (item.sizex) - this.baseMarginLeft) + 'px',
+                    height: (this.cellHeight * (item.sizey) - this.baseMarginTop) + 'px',
+                    // left: (this.cellWidth * (item.x - 1) + this.baseMarginLeft) + 'px',
+                    // top: (this.cellHeight * (item.y - 1) + this.baseMarginTop) + 'px'
+                }
+            } else {
+                return {
+                    width: (this.cellWidth * (item.sizex) - this.baseMarginLeft) + 'px',
+                    height: (this.cellHeight * (item.sizey) - this.baseMarginTop) + 'px',
+                    left: (this.cellWidth * (item.x - 1) + this.baseMarginLeft) + 'px',
+                    top: (this.cellHeight * (item.y - 1) + this.baseMarginTop) + 'px'
+                }
             }
         },
         /**
