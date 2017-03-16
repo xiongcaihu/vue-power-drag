@@ -5,7 +5,7 @@
         </div>
         <div v-if="renderOk">
             <transition-group name="flip-list">
-                <div v-show="item.show" :class="{movingItem:item.isPlayer}" class="item" @mousedown="startMove($event,item,index)" :ref="'item'+index" v-for="(item,index) in list"
+                <div :class="{movingItem:item.isPlayer}" class="item" @mousedown="startMove($event,item,index)" :ref="'item'+index" v-for="(item,index) in list"
                     :key="'item'+index" :style="nowItemStyle(item,index)">
                     <slot :name="'slot'+index"></slot>
                     <span class="resizeHandle" @mousedown="startResize($event,item,index)"></span>

@@ -7,9 +7,8 @@ let coordinates = []; //坐标点集合
 let debounceId = 0;
 let nowTask = undefined;
 let lastTask = undefined;
-let canRun = true;
-
 let isOverlay = false; //是否正在交换位置
+let moveTime=80;//移动动画时间
 
 function makeAnimation(func) {
     return new Promise(function (r) {
@@ -19,21 +18,22 @@ function makeAnimation(func) {
 }
 
 function debounce(func, time) {
-    if (canRun) {
-        canRun=false;
+    if (!isOverlay) {
         (function (t) {
+            isOverlay = true;
             setTimeout(function () {
-                makeAnimation(t).then(function () {
-                    canRun=true;
-                    if(lastTask!=undefined){
-                        debounce(lastTask,time);
+                t();
+                setTimeout(function () {
+                    isOverlay = false;
+                    if (lastTask != undefined) {
+                        debounce(lastTask, time);
                     }
-                })
+                }, moveTime);
             }, time);
         })(func)
-        lastTask=undefined;
-    }else{
-        lastTask=func;
+        lastTask = undefined;
+    } else {
+        lastTask = func;
     }
 
 }
@@ -45,7 +45,7 @@ function debounce(func, time) {
 function resetPositionBox() {
     //根据当前容器的宽度来决定多少列
     let cells = parseInt(this.$refs['container'].offsetWidth / this.cellWidth);
-    let rows = 1200; //初始100行，后面根据需求会自动增加
+    let rows = 2000; //初始100行，后面根据需求会自动增加
     for (let i = 0; i < rows; i++) {
         let row = [];
 
@@ -150,7 +150,6 @@ function resizePlayer(item, newSize) {
  * @param {any} position
  */
 function movePlayer(item, position) {
-    if(isOverlay) return;
     let vm = this;
     removeItemFromPositionBox(item);
 
@@ -177,10 +176,6 @@ function movePlayer(item, position) {
     if (canGoUpRows > 0) {
         moveItemUp.call(this, item, canGoUpRows);
     }
-
-    setTimeout(function () {
-        isOverlay = false;
-    }, 100);
 }
 
 function removeItem(item) {
@@ -603,13 +598,17 @@ export default {
             if (target.attr("class") && target.attr("class").indexOf("item") != -1) {
                 this.infoBox.nowItemNode = target;
                 this.infoBox.cloneItem = target.clone();
+                this.infoBox.clonePlaceHolder = target.clone();
             } else {
                 this.infoBox.nowItemNode = target.parents(".item");
                 this.infoBox.cloneItem = this.infoBox.nowItemNode.clone();
+                this.infoBox.clonePlaceHolder = this.infoBox.nowItemNode.clone();
             }
             this.infoBox.cloneItem.addClass("cloneNode");
+            this.infoBox.clonePlaceHolder.addClass("movingItem");
 
             $(this.$el).append(this.infoBox.cloneItem);
+            $(this.$el).append(this.infoBox.clonePlaceHolder);
 
             this.infoBox.orignX = this.infoBox.cloneItem.position().left;
             this.infoBox.orignY = this.infoBox.cloneItem.position().top;
@@ -624,15 +623,20 @@ export default {
             if (this.infoBox.cloneItem) {
                 this.infoBox.cloneItem.remove();
             }
+            if(this.infoBox.clonePlaceHolder){
+                this.infoBox.clonePlaceHolder.remove();
+            }
             if (this.infoBox.moveItem) {
+                this.$set(this.infoBox.moveItem, "show", true);
                 this.$delete(this.infoBox.moveItem, "isPlayer");
             }
-            this.infoBox = null;
+            this.infoBox = {};
         },
         moving(e) {
             let moveItem = _.get(this.infoBox, "moveItem");
             let resizeItem = _.get(this.infoBox, "resizeItem");
             if (resizeItem) { //调整大小时
+                this.$set(resizeItem, "isPlayer", true);
                 let nowItemIndex = this.infoBox.resizeItemIndex;
                 let cloneItem = this.infoBox.cloneItem;
                 let startX = this.infoBox.startX;
@@ -667,8 +671,10 @@ export default {
                 })
             } else if (moveItem) {
                 this.$set(moveItem, "isPlayer", true);
+                this.$set(moveItem, "show", false);
                 let nowItemIndex = this.infoBox.moveItemIndex;
                 let cloneItem = this.infoBox.cloneItem;
+                let clonePlaceHolder = this.infoBox.clonePlaceHolder;
                 let startX = this.infoBox.startX;
                 let startY = this.infoBox.startY;
                 let orignX = this.infoBox.orignX;
@@ -714,6 +720,14 @@ export default {
                         }
                     }
                 })(newX, oldX, newY, oldY), 20);
+
+                if (newX != oldX || oldY != newY) {
+                    clonePlaceHolder.css({
+                        left: (this.cellWidth * (newX - 1) + this.baseMarginLeft) + 'px',
+                        top: (this.cellHeight * (newY - 1) + this.baseMarginTop) + 'px',
+                    })
+                }
+
                 // if (!isOverlay) {
                 //     setTimeout(function () {
                 //         if (newX != oldX || oldY != newY) {
@@ -747,7 +761,8 @@ export default {
                 width: (this.cellWidth * (item.sizex) - this.baseMarginLeft) + 'px',
                 height: (this.cellHeight * (item.sizey) - this.baseMarginTop) + 'px',
                 left: (this.cellWidth * (item.x - 1) + this.baseMarginLeft) + 'px',
-                top: (this.cellHeight * (item.y - 1) + this.baseMarginTop) + 'px'
+                top: (this.cellHeight * (item.y - 1) + this.baseMarginTop) + 'px',
+                opacity:item.show?1:0,
             }
         },
         /**

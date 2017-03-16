@@ -1,6 +1,11 @@
 <template>
     <div id="app">
         <button @click="pirntList()">print list</button>
+        <!--<drag :your-list="myList" :baseWidth="10" :baseHeight="5">
+            <div class="chart" v-for="(item,index) in myList" :slot="'slot'+index" :ref="'chart'+index">
+                {{item.id}}
+            </div>
+        </drag>-->
         <drag :your-list="myList" :baseWidth="100" :baseHeight="50">
             <div class="chart" v-for="(item,index) in myList" :slot="'slot'+index" :ref="'chart'+index">
                 {{item.id}}
@@ -15,13 +20,21 @@
     // 在 Highcharts 加载之后加载功能模块
     require('highcharts/modules/exporting')(Highcharts);
 
-    import drag from './components/drag4/drag.vue';
+    import drag from './components/drag5/drag.vue';
     import mock from "mockjs"
 
     export default {
         data() {
             let list = mock.mock({
-                "myList|100": [{
+                // "myList|200": [{
+                //     "id|+1": 1,
+                //     "text|+1": 1,
+                //     x: "@integer(1,20)",
+                //     y: "@integer(1,20)",
+                //     sizex: "@integer(10,10)",
+                //     sizey: "@integer(10,10)",
+                // }],
+                "myList|500": [{
                     "id|+1": 1,
                     "text|+1": 1,
                     x: "@integer(1,5)",
