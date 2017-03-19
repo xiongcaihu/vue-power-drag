@@ -6,7 +6,7 @@
                 {{item.id}}
             </div>
         </drag>-->
-        <drag :your-list="myList" :baseWidth="100" :baseHeight="50">
+        <drag :your-list="myList" :baseWidth="100" :baseHeight="50" ref="drag">
             <div class="chart" v-for="(item,index) in myList" :slot="'slot'+index" :ref="'chart'+index">
                 {{item.id}}
             </div>
@@ -20,13 +20,13 @@
     // 在 Highcharts 加载之后加载功能模块
     require('highcharts/modules/exporting')(Highcharts);
 
-    import drag from './components/drag5/drag.vue';
+    import drag from './components/drag7/drag.vue';
     import mock from "mockjs"
 
     export default {
         data() {
             let list = mock.mock({
-                // "myList|200": [{
+                // "myList|100": [{
                 //     "id|+1": 1,
                 //     "text|+1": 1,
                 //     x: "@integer(1,20)",
@@ -34,7 +34,7 @@
                 //     sizex: "@integer(10,10)",
                 //     sizey: "@integer(10,10)",
                 // }],
-                "myList|500": [{
+                "myList|5": [{
                     "id|+1": 1,
                     "text|+1": 1,
                     x: "@integer(1,5)",
@@ -45,7 +45,6 @@
             })
             return {
                 myList: list.myList,
-                // myList:[{"id":1,"text":1,"x":3,"y":2,"sizex":3,"sizey":1},{"id":2,"text":2,"x":1,"y":1,"sizex":1,"sizey":2},{"id":3,"text":3,"x":3,"y":2,"sizex":2,"sizey":2}]
                 // myList: [
                 //     {
                 //     id: 1,
@@ -128,7 +127,7 @@
         name: 'app',
         methods: {
             pirntList() {
-                console.dir(JSON.stringify(_.sortBy(this.myList, ['y'])));
+                console.dir(JSON.stringify(this.$refs['drag'].getList()));
             }
         },
         mounted() {

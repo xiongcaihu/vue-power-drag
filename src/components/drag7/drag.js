@@ -1,6 +1,9 @@
 import _ from "lodash"
 import $ from "jquery"
 
+//事情
+//边界填充，回调事件暴露
+
 let positionBox = [];
 let coordinates = []; //坐标点集合
 
@@ -39,7 +42,7 @@ function resetPositionBox() {
     //根据当前容器的宽度来决定多少列
     let cells = parseInt(this.$refs['container'].offsetWidth / this.cellWidth);
     itemMaxX = cells;
-    let rows = 1000; //初始100行，后面根据需求会自动增加
+    let rows = 3000; //初始100行，后面根据需求会自动增加
     for (let i = 0; i < rows; i++) {
         let row = [];
 
@@ -189,7 +192,7 @@ function movePlayer(item, position) {
     let vm = this;
     removeItemFromPositionBox(item);
 
-    checkItemPosition.call(this, item, position);
+    // checkItemPosition.call(this, item, position);
 
     let belowItems = findBelowItems.call(this, item);
 
@@ -246,10 +249,10 @@ function addItem(item, index) {
     copyItem._dragId = index;
     copyItem.show = false;
 
-    checkItemPosition.call(this, copyItem, {
-        x: copyItem.x,
-        y: copyItem.y
-    });
+    // checkItemPosition.call(this, copyItem, {
+    //     x: copyItem.x,
+    //     y: copyItem.y
+    // });
 
     emptyTargetCell.call(this, copyItem);
 
@@ -431,9 +434,9 @@ function moveItemDown(item, size) {
     })
 
     // item.y += size;
-    checkItemPosition.call(this, item, {
-        y: item.y + size
-    });
+    // checkItemPosition.call(this, item, {
+    //     y: item.y + size
+    // });
     setPlayerPosition.call(this, item, {
         y: item.y + size
     })
@@ -514,6 +517,10 @@ function findBelowItems(item) {
     for (let cell = item.x - 1; cell < item.x - 1 + item.sizex; cell++) {
         for (let row = item.y - 1; row < positionBox.length; row++) {
             let target = positionBox[row][cell];
+            if(target==undefined){
+                console.log("row=%d,cell=%d",row,cell);
+                console.dir(positionBox);
+            }
             if (target.el) {
                 // belowItems.push(target.el);
                 belowItems[target.el._dragId] = target.el;
@@ -804,6 +811,14 @@ export default {
                 opacity: item.show ? 1 : 0
             }
         },
+        getList(){
+            let returnList=_.sortBy(this.list,'y');
+            _.forEach(returnList,function(item,index){
+                delete item['_dragId'];
+                delete item['show'];
+            });
+            return returnList;
+        }
     },
     created() {
         this.cellWidth = this.baseWidth + this.baseMarginLeft;

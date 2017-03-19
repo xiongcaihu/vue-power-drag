@@ -10,6 +10,32 @@
                 <span class="resizeHandle" @mousedown="startResize($event,item,index)"></span>
             </div>
         </div>
+        <!--<div class="positionBox">
+            <table border="1">
+                <thead>
+                    <tr>
+                        <td></td>
+                        <td v-for="(item,index) in positionBox">
+                            {{index}}
+                        </td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="(item,index) in positionBox" v-if="index<20">
+                        <td>{{index}}</td>
+                        <td v-for="(subItem,index2) in item">
+                            {{subItem.el.id}}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="coords">
+            <p v-for="(item,index) in coordinates">
+                {{item.el.id}} : {{item.x1+'-'+item.x2+'-'+item.y1+'-'+item.y2}}
+            </p>
+        </div>-->
     </div>
 </template>
 
