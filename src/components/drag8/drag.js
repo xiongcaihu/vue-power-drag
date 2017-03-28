@@ -119,9 +119,11 @@ function recalcCellWidth() {
 
     let cells = parseInt(containerWidth / this.cellWidth);
     this.maxCell = cells;
-    if (containerWidth % this.cellWidth !== 0) {
-        this.cellWidth += containerWidth % this.cellWidth / cells;
-    }
+
+    // if (containerWidth % this.cellWidth !== 0) {
+    //     this.cellWidth += containerWidth % this.cellWidth / cells;
+    // }
+
 }
 
 function init() {
@@ -717,22 +719,22 @@ export default {
             infoBox.orignWidth = infoBox.cloneItem.prop("offsetWidth");
             infoBox.orignHeight = infoBox.cloneItem.prop("offsetHeight");
 
-            $(window).mousemove(function (e) {
-                let moveItem = _.get(vm.infoBox, "moveItem");
-                let resizeItem = _.get(vm.infoBox, "resizeItem");
+            function itemMouseMove(e) {
+                let moveItem = _.get(infoBox, "moveItem");
+                let resizeItem = _.get(infoBox, "resizeItem");
 
                 if (resizeItem) { //调整大小时
-                    vm.resizing.call(null, e, resizeItem,resizeItem._dragId);
+                    vm.resizing.call(null, e, resizeItem, resizeItem._dragId);
 
                     vm.$set(resizeItem, "isPlayer", true);
-                    let nowItemIndex = vm.infoBox.resizeItemIndex;
-                    let cloneItem = vm.infoBox.cloneItem;
-                    let startX = vm.infoBox.startX;
-                    let startY = vm.infoBox.startY;
-                    let oldSizeX = vm.infoBox.oldSizeX;
-                    let oldSizeY = vm.infoBox.oldSizeY;
-                    let orignWidth = vm.infoBox.orignWidth;
-                    let orignHeight = vm.infoBox.orignHeight;
+                    let nowItemIndex = infoBox.resizeItemIndex;
+                    let cloneItem =infoBox.cloneItem;
+                    let startX = infoBox.startX;
+                    let startY = infoBox.startY;
+                    let oldSizeX = infoBox.oldSizeX;
+                    let oldSizeY = infoBox.oldSizeY;
+                    let orignWidth = infoBox.orignWidth;
+                    let orignHeight = infoBox.orignHeight;
 
                     let moveXSize = e.pageX - startX; //X方向移动的距离
                     let moveYSize = e.pageY - startY; //Y方向移动的距离
@@ -764,18 +766,18 @@ export default {
                 } else if (moveItem) {
                     scrollScreen(e);
                     if (!vm.draggable) return;
-                    vm.dragging.call(null, e, moveItem,moveItem._dragId);
+                    vm.dragging.call(null, e, moveItem, moveItem._dragId);
 
                     vm.$set(moveItem, "isPlayer", true);
                     // this.$set(moveItem, "show", false);
-                    let nowItemIndex = vm.infoBox.moveItemIndex;
-                    let cloneItem = vm.infoBox.cloneItem;
-                    let startX = vm.infoBox.startX;
-                    let startY = vm.infoBox.startY;
-                    let orignX = vm.infoBox.orignX;
-                    let orignY = vm.infoBox.orignY;
-                    let oldX = vm.infoBox.oldX;
-                    let oldY = vm.infoBox.oldY;
+                    let nowItemIndex = infoBox.moveItemIndex;
+                    let cloneItem = infoBox.cloneItem;
+                    let startX = infoBox.startX;
+                    let startY = infoBox.startY;
+                    let orignX = infoBox.orignX;
+                    let orignY = infoBox.orignY;
+                    let oldX = infoBox.oldX;
+                    let oldY = infoBox.oldY;
 
                     let moveXSize = e.pageX - startX; //X方向移动的距离
                     let moveYSize = e.pageY - startY; //Y方向移动的距离
@@ -797,8 +799,8 @@ export default {
                                     y: newY
                                 })
 
-                                vm.infoBox.oldX = newX;
-                                vm.infoBox.oldY = newY;
+                                infoBox.oldX = newX;
+                                infoBox.oldY = newY;
                             }
                         }
                     })(newX, oldX, newY, oldY), 10);
@@ -808,25 +810,28 @@ export default {
                         top: nowCloneItemY + 'px'
                     })
                 }
-            })
+            }
 
-            $(window).mouseup(function (e) {
+            $(window).mousemove(itemMouseMove);
+
+            $(window).mouseup(function itemMouseUp(e) {
                 if (_.isEmpty(vm.infoBox)) return;
                 if (vm.infoBox.cloneItem) {
                     vm.infoBox.cloneItem.remove();
                 }
                 if (vm.infoBox.resizeItem) {
                     vm.$delete(vm.infoBox.resizeItem, "isPlayer");
-                    vm.resizeEnd.call(null, e, vm.infoBox.resizeItem,vm.infoBox.resizeItem._dragId);
+                    vm.resizeEnd.call(null, e, vm.infoBox.resizeItem, vm.infoBox.resizeItem._dragId);
                 }
                 if (vm.infoBox.moveItem) {
-                    vm.dragEnd.call(null, e, vm.infoBox.moveItem,vm.infoBox.moveItem._dragId);
+                    vm.dragEnd.call(null, e, vm.infoBox.moveItem, vm.infoBox.moveItem._dragId);
                     vm.$set(vm.infoBox.moveItem, "show", true);
                     vm.$delete(vm.infoBox.moveItem, "isPlayer");
                 }
                 vm.infoBox = {};
 
-                $(this).off('mousemove mouseup');
+                $(this).off('mousemove',itemMouseMove);
+                $(this).off('mouseup',itemMouseUp);
             })
         },
         endMove(e) {

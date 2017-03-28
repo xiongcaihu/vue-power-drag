@@ -4,8 +4,9 @@
             <span @click="addChart()">Add Chart</span>
             <span @click="addItemBox()">Add Item Box</span>
         </div>
-        <cy-gridster ref="cyGridster" :your-list="myList" :base-width="100" :base-height="100" :drag-start="dragStart" :dragging="dragging"
-            :drag-end="dragEnd" :resize-start="resizeStart" :resizing="resizing" :resize-end="resizeEnd">
+        <cy-gridster ref="cyGridster" :your-list="myList" :base-margin-left="baseMarginLeft" :base-margin-top="baseMarginTop" :base-width="baseWidth"
+            :base-height="baseHeight" :drag-start="dragStart" :dragging="dragging" :drag-end="dragEnd" :resize-start="resizeStart"
+            :resizing="resizing" :resize-end="resizeEnd">
             <template v-for="(item,index) in myList" :slot="'slot'+index">
                 <div class="dragHandle">
                     <div class="tool">
@@ -26,7 +27,7 @@
     // 在 Highcharts 加载之后加载功能模块
     // require('highcharts/modules/exporting')(Highcharts);
 
-    import drag from './components/vueGridster/drag.vue';
+    import drag from './components/drag8/drag.vue';
     import mock from "mockjs"
     import _ from "lodash";
 
@@ -55,6 +56,8 @@
             })
             return {
                 myList: list.myList,
+                baseWidth: 0,
+                baseHeight: 0
             }
         },
         components: {
@@ -76,13 +79,13 @@
 
                 gridster.$nextTick(function () {
                     //调用addItemBox后，会在this.myList中增加一个item，而增加的位置，每次都是最后
-                    let chart=new Highcharts.chart(vm.$refs['chart' + (vm.myList.length - 1)][0], mock.mock({
-                        chart:{
-                            'type|1':['line','spline','column']
+                    let chart = new Highcharts.chart(vm.$refs['chart' + (vm.myList.length - 1)][0], mock.mock({
+                        chart: {
+                            'type|1': ['line', 'spline', 'column']
                         },
-                        title:{
-                            align:'left',
-                            text:'@title(2,3)'
+                        title: {
+                            align: 'left',
+                            text: '@title(2,3)'
                         },
                         credits: {
                             enabled: false
@@ -92,7 +95,7 @@
                         }]
                     }));
 
-                    chartInstanceBox['chart'+(vm.myList.length-1)]=chart;
+                    chartInstanceBox['chart' + (vm.myList.length - 1)] = chart;
                 })
             },
             addItemBox() {
@@ -116,19 +119,27 @@
                 item：拖动对象
                 index：拖动对象下标
              */
-            dragStart(e, item, index) {
-            },
-            dragging(e, item, index) {
-            },
-            dragEnd(e, item, index) {
-            },
-            resizeStart(e, item, index) {
-            },
-            resizing(e, item, index) {
-            },
+            dragStart(e, item, index) {},
+            dragging(e, item, index) {},
+            dragEnd(e, item, index) {},
+            resizeStart(e, item, index) {},
+            resizing(e, item, index) {},
             resizeEnd(e, item, index) {
-                chartInstanceBox['chart'+index].reflow();        
+                chartInstanceBox['chart' + index].reflow();
             }
+        },
+        created() {
+            //屏幕适配，使得当前布局能在所有分辨率下适用，示例是在1366*638分辨率下完成
+            let screenWidth = window.innerWidth;
+            let screenHeight = window.innerHeight;
+            this.baseWidth = 90.8333 * (screenWidth / 1366);
+            this.baseHeight = 100 * (screenHeight / 638);
+            this.baseMarginLeft = 20 * (screenWidth / 1366);
+            this.baseMarginTop = 20 * (screenHeight / 638);
+
+            this.$nextTick(function(){
+                $(".dragAndResize").css("width","calc(100% - "+(this.baseMarginLeft)+"px)")
+            })
         },
         mounted() {
             let vm = this;
@@ -180,17 +191,15 @@
             box-sizing: border-box;
         }
     }
-
+    
     #demo {
         width: 100%;
-        padding: 1.5rem 1.5rem 1.5rem 0;
-
+        padding: 1.5em 0 1.5em 0;
         .head {
             position: absolute;
             left: .5rem;
             top: 1rem;
-            z-index:9;
-
+            z-index: 9;
             span {
                 cursor: pointer;
                 font-weight: bold;
@@ -198,13 +207,11 @@
             }
         }
     }
-
+    
     //拖动布局容器样式
     .dragAndResize {
-        width: e('calc(100% - 1.5rem)');
         //布局框样式
         .item {}
-        
         .dragHandle {
             //拖动手柄样式
             padding: 1.5rem!important;
@@ -216,7 +223,6 @@
                 cursor: pointer;
                 font-weight: bold;
             }
-
             .chart {
                 width: 100%;
                 height: 100%;
