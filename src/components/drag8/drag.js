@@ -172,8 +172,8 @@ function resizePlayer(item, newSize) {
     item.sizex = newSize.sizex;
     item.sizey = newSize.sizey;
 
-    if (item.sizex + item.x - 1 > itemMaxX) {
-        item.sizex = itemMaxX - item.x + 1;
+    if (item.sizex + item.x > itemMaxX) {
+        item.sizex = itemMaxX - item.x;
     }
 
     if (item.sizey + item.y > itemMaxY) {
