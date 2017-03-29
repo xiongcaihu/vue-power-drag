@@ -208,8 +208,8 @@ function checkItemPosition(item, position) {
         item.x = 1;
     }
 
-    if (item.x + item.sizex - 1 > itemMaxX) {
-        item.x = itemMaxX - item.sizex + 1;
+    if (item.x + item.sizex > itemMaxX) {
+        item.x = itemMaxX - item.sizex ;
     }
 
     if (item.y < 1) {
