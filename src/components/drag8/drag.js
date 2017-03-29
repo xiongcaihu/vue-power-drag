@@ -275,6 +275,7 @@ function removeItem(index) {
         }
     })
 
+    this.yourList.splice(index, 1, {});
 }
 
 function addItem(item, index) {
