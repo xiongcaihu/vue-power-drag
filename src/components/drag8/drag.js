@@ -172,8 +172,8 @@ function resizePlayer(item, newSize) {
     item.sizex = newSize.sizex;
     item.sizey = newSize.sizey;
 
-    if (item.sizex + item.x > itemMaxX) {
-        item.sizex = itemMaxX - item.x;
+    if (item.sizex + item.x - 1 > itemMaxX) {
+        item.sizex = itemMaxX - item.x + 1;
     }
 
     if (item.sizey + item.y > itemMaxY) {
@@ -208,8 +208,8 @@ function checkItemPosition(item, position) {
         item.x = 1;
     }
 
-    if (item.x + item.sizex > itemMaxX) {
-        item.x = itemMaxX - item.sizex ;
+    if (item.x + item.sizex - 1 > itemMaxX) {
+        item.x = itemMaxX - item.sizex + 1;
     }
 
     if (item.y < 1) {
@@ -729,7 +729,7 @@ export default {
 
                     vm.$set(resizeItem, "isPlayer", true);
                     let nowItemIndex = infoBox.resizeItemIndex;
-                    let cloneItem =infoBox.cloneItem;
+                    let cloneItem = infoBox.cloneItem;
                     let startX = infoBox.startX;
                     let startY = infoBox.startY;
                     let oldSizeX = infoBox.oldSizeX;
@@ -831,8 +831,8 @@ export default {
                 }
                 vm.infoBox = {};
 
-                $(this).off('mousemove',itemMouseMove);
-                $(this).off('mouseup',itemMouseUp);
+                $(this).off('mousemove', itemMouseMove);
+                $(this).off('mouseup', itemMouseUp);
             })
         },
         endMove(e) {
@@ -907,6 +907,6 @@ export default {
 
     },
     mounted() {
-        init.call(this);
+        // init.call(this);
     }
 }
