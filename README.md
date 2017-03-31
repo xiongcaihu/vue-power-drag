@@ -1,5 +1,3 @@
 # vue-power-drag
 
----
-
 
