@@ -1,5 +1,5 @@
 # vue-power-drag
-#### v0.1
+#### v0.1.1
 
 > 基于vue2.x的拖动缩放组件，可嵌套子组件，作者cy
 
@@ -10,10 +10,43 @@
 
 ``` bash
 # 根据自己网络情况选择,cnpm怎么用请自行百度
-npm install or cnpm install
+npm install vue-power-drag 
+cnpm install vue-power-drag
 
-# serve with hot reload at localhost:8080
-npm run dev
+then
+
+---vue
+<template>
+    <div id="demo">
+        <vue-power-drag :your-list="list">
+            <template v-for="(item,index) in list" :slot="'slot'+index">
+                //循环自己需要的组件
+            </template>
+        </vue-power-drag>
+    </div>
+</template>
+<script>
+import drag from 'vue-power-drag'
+
+export default{
+    data(){
+        return {
+            list:[
+                {
+                    x:1,
+                    y:1,
+                    sizex:1,
+                    sizey:1
+                }
+            ]
+        }
+    },
+    components:{
+        'vue-power-drag':drag
+    }
+}
+</script>
+
 ```
 
 ## Document
