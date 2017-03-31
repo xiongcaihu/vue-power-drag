@@ -1,16 +1,11 @@
 <template>
     <div class='dragAndResize' ref='container' @mousedown="containerMouseDown($event)" @mouseup="endMove($event)" @mousemove="moving($event)">
-        <div class="mask" v-if="!renderOk">
-            <span class="thing"></span>
-        </div>
-        <div v-if="renderOk" class="item" @mousedown="startMove($event,item,index)" :ref="'item'+index" v-for="(item,index) in list" :style="nowItemStyle(item,index)">
-            <slot :name="'slot'+index"></slot>
-            <span class="resizeHandle" @mousedown="startResize($event,item,index)"></span>
-        </div>
-        <div class="positionBox">
-            <p v-for="(value,key) in positionBox">
-                {{key+":"+value}}
-            </p>
+        <div v-if="renderOk">
+            <div :class="{item:true,moveAnimation:moveAnimate,movingItem:item.isPlayer,canNotDrag:!draggable}" @mousedown="startMove($event,item,index)" :ref="'item'+index" v-for="(item,index) in yourList"
+                :key="'item'+index" :style="nowItemStyle(item,index)">
+                <slot :name="'slot'+index"></slot>
+                <span class="resizeHandle" v-show="resizable" @mousedown="startResize($event,item,index)"></span>
+            </div>
         </div>
     </div>
 </template>
