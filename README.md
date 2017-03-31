@@ -8,34 +8,46 @@
         yourList: {
             required: true,
             type: Array
-        },
-        baseWidth: {
-            required: false,
+            
+            /*
+            yourList:[
+                {
+                    _dragId:int,//这个是在此组件初始化时附加的临时变量，代表当前对象所在yourList中的下标值（请勿传入相同字段）
+                    x:int, //x轴位置
+                    y:int, //y轴位置
+                    sizex:int, //x方向大小（宽度=单元格宽度*x）
+                    sizey:int //y方向大小（高度=单元格高度*y）
+                }
+            ]
+            */
+        },
+        baseWidth: {//最小单元格宽度
+            required: false,
             type: Number,
-            default: 100
-        },
-        baseHeight: {
-            required: false,
+            default: 100//如果你的项目中会存在很多方框，那么建议尽量用大一点的数字
+        },
+        baseHeight: {//最小单元格高度
+            required: false,
             type: Number,
             default: 50
         },
-        baseMarginLeft: {
-            required: false,
+        baseMarginLeft: {//单元格左边距
+            required: false,
             type: Number,
             default: 20
         },
-        baseMarginTop: {
-            required: false,
+        baseMarginTop: {//单元格上边距
+            required: false,
             type: Number,
             default: 20
         },
-        draggable: {
-            required: false,
+        draggable: {//是否允许拖动
+            required: false,
             default: true,
             type: Boolean
         },
-        dragStart: {
-            required: false,
+        dragStart: {//拖动开始时的事件
+            required: false,
             type: Function,
             default: function (e,item,index) {
               //e:事件对象
@@ -43,32 +55,32 @@
               //index:item的下标
             }
         },
-        dragging: {
+        dragging: {//拖动过程中的事件
             required: false,
             type: Function,
             default: function (e,item,index) {}
         },
-        dragEnd: {
+        dragEnd: {//拖动结束时的事件
             required: false,
             type: Function,
             default: function (e,item,index) {}
         },
-        resizable: {
-            required: false,
+        resizable: {//是否允许缩放
+            required: false,
             type: Boolean,
             default: true,
         },
-        resizeStart: {
+        resizeStart: {//缩放开始事件
+            required: false,
+            type: Function,
+            default: function (e,item,index) {}
+        },
+        resizing: {//缩放过程中的事件
             required: false,
             type: Function,
             default: function (e,item,index) {}
         },
-        resizing: {
-            required: false,
-            type: Function,
-            default: function (e,item,index) {}
-        },
-        resizeEnd: {
+        resizeEnd: {//缩放结束时的事件
             required: false,
             type: Function,
             default: function (e,item,index) {}
@@ -77,18 +89,18 @@
 
 -----
 
-<b>Api</b>
-
-      init:function(){
-          // 在组件mounted后的手动初始化方式，方便多次初始化而不用去重新载入组件。
-      } 
-      addItemBox:function(item){
-          // item:布局方框，属性值应和props中的yourList数组对应的对象相同
-      }
-      getList:function(){
-          //此方法返回将yourList按照asc排序的数组
-          return sortedList; 
-      }
-      getMaxCell：function(){
-          //此方法返回当前宽度下每行的最大单元格个数
-      }
+<b>Api：</b>
+        
+          init:function(){
+              // 在组件mounted后的手动初始化方式，方便多次初始化而不用去重新载入组件。
+          } 
+          addItemBox:function(item){
+              // item:布局方框，属性值应和props中的yourList数组对应的对象相同
+          }
+          getList:function(){
+              //此方法返回将yourList按照asc排序的数组
+              return sortedList; 
+          }
+          getMaxCell：function(){
+              //此方法返回当前宽度下每行的最大单元格个数
+          }
