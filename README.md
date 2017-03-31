@@ -2,14 +2,15 @@
 #### v0.1
 ---
 
-<b>Attributes</b>:
 
+<b>Attributes</b>:
+<pre>
     props: {
         yourList: {
             required: true,
-            type: Array
+            type: Array,   
             
-            /*
+            /*
             yourList:[
                 {
                     _dragId:int,//这个是在此组件初始化时附加的临时变量，代表当前对象所在yourList中的下标值（请勿传入相同字段）
@@ -86,21 +87,22 @@
             default: function (e,item,index) {}
         }
     }
-
+</pre>
 -----
 
 <b>Api：</b>
-        
-          init:function(){
-              // 在组件mounted后的手动初始化方式，方便多次初始化而不用去重新载入组件。
-          } 
-          addItemBox:function(item){
-              // item:布局方框，属性值应和props中的yourList数组对应的对象相同
-          }
-          getList:function(){
-              //此方法返回将yourList按照asc排序的数组
-              return sortedList; 
-          }
-          getMaxCell：function(){
-              //此方法返回当前宽度下每行的最大单元格个数
-          }
+<pre>
+      init:function(){
+          // 在组件mounted后的手动初始化方式，方便多次初始化而不用去重新载入组件。
+      } 
+      addItemBox:function(item){
+          // item:布局方框，属性值应和props中的yourList数组对应的对象相同
+      }
+      getList:function(){
+          //此方法返回将yourList按照asc排序的数组
+          return sortedList; 
+      }
+      getMaxCell：function(){
+          //此方法返回当前宽度下每行的最大单元格个数
+      }    
+</pre>
