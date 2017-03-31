@@ -2,8 +2,8 @@
 #### v0.1
 ---
 
-##DEMO
-<a href='https://xiongcaihu.github.io/#/'>https://xiongcaihu.github.io/#/</a>
+## DEMO
+<a href='https://xiongcaihu.github.io/#/' target="_blank">https://xiongcaihu.github.io/#/</a>
 
 <b>Attributes</b>:
 <pre>
