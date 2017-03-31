@@ -14,11 +14,13 @@ npm install or cnpm install
 
 # serve with hot reload at localhost:8080
 npm run dev
+```
 
 ## Document
 
-<b>Attributes</b>:
-<pre>
+##### Attributes
+
+```bash
     props: {
         yourList: {
             required: true,
@@ -101,10 +103,11 @@ npm run dev
             default: function (e,item,index) {}
         }
     }
-</pre>
+```
 
-<b>Api：</b>
-<pre>
+##### API
+
+```bash
       init:function(){
           // 在组件mounted后的手动初始化方式，方便多次初始化而不用去重新载入组件。
       } 
@@ -118,4 +121,4 @@ npm run dev
       getMaxCell：function(){
           //此方法返回当前宽度下每行的最大单元格个数
       }    
-</pre>
+```
