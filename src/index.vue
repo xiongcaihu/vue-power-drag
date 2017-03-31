@@ -6,6 +6,7 @@
             <router-link to="/power500">性能测试500</router-link>
             <router-link to="/power1000">性能测试1000</router-link>
             <router-link to="/chart">嵌入highchart用法</router-link>
+            <a href="https://github.com/xiongcaihu/vue-power-drag">文档</a>
         </div>
         <div class="center">
             <transition-group class="content" name="item">
