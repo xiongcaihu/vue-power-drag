@@ -6,6 +6,10 @@
 ## DEMO
 <a href='https://xiongcaihu.github.io/#/' target="_blank">https://xiongcaihu.github.io/#/</a>
 
+## Live DEMO
+<img src="http://git.oschina.net/xiongcaihu/yeah2/raw/master/test1.gif">
+<img src="http://git.oschina.net/xiongcaihu/yeah2/raw/master/test2.gif">
+
 ## Build Setup
 
 ``` bash
