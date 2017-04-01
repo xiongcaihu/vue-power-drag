@@ -147,6 +147,9 @@ export default{
       addItemBox:function(item){
           // item:布局方框，属性值应和props中的yourList数组对应的对象相同
       }
+      removeItem:function(index){
+          // index:方框所在list中的下标
+      }
       getList:function(){
           //此方法返回将yourList按照asc排序的数组
           return sortedList; 
