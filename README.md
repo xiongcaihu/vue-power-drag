@@ -7,8 +7,8 @@
 <a href='https://xiongcaihu.github.io/#/' target="_blank">https://xiongcaihu.github.io/#/</a>
 
 ## Live DEMO
-<img src="http://git.oschina.net/xiongcaihu/yeah2/raw/master/test1.gif">
-<img src="http://git.oschina.net/xiongcaihu/yeah2/raw/master/test2.gif">
+<img src="https://github.com/xiongcaihu/vue-power-drag/blob/master/test1.gif?raw=true">
+<img src="https://github.com/xiongcaihu/vue-power-drag/blob/master/test2.gif?raw=true">
 
 ## Build Setup
 
