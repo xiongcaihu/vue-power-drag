@@ -1,6 +1,6 @@
 {
     "name": "vue-power-drag",
-    "version": "0.0.1",
+    "version": "0.1.5",
     "description": "A layout component like gridster",
     "author": "cy",
     "scripts": {
