@@ -116,7 +116,7 @@ function recalcCellWidth() {
     let containerNode = this.$refs['container'];
     let containerWidth = containerNode.offsetWidth;
 
-    let cells = parseInt(containerWidth / this.cellWidth);
+    let cells = Math.round(containerWidth / this.cellWidth);
     this.maxCell = cells;
 
     // if (containerWidth % this.cellWidth !== 0) {
