@@ -660,7 +660,7 @@ export default {
             if (!this.resizable) return;
             this.resizeStart.call(null, e, item, index);
 
-            e.preventDefault();
+            // e.preventDefault();
             let target = $(e.target);
 
             if (!this.infoBox) {
@@ -673,7 +673,7 @@ export default {
             this.infoBox.resizeItemIndex = index;
         },
         containerMouseDown(e) {
-            e.preventDefault();
+            // e.preventDefault();
             if (!this.infoBox) {
                 this.infoBox = {}
             }
@@ -683,7 +683,7 @@ export default {
         },
         startMove(e, item, index) {
             let vm = this;
-            e.preventDefault();
+            // e.preventDefault();
 
             if (!this.infoBox) {
                 this.infoBox = {}
