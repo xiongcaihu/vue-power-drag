@@ -272,7 +272,7 @@ function removeItem(index) {
 
     let belowItems = findBelowItems.call(this, item);
 
-    $(this.$refs['item' + item._dragId][0]).remove();
+    // $(this.$refs['item' + item._dragId][0]).remove();
 
     _.forEach(belowItems, function (upItem) {
         let canGoUpRows = canItemGoUp(upItem);
