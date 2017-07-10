@@ -146,9 +146,8 @@ function init() {
     resetPositionBox.call(this);
 
     let i = 0;
-    let length = this.yourList.length;
     let timeid = setInterval(function () {
-        if (i >= length) {
+        if (i >= vm.yourList.length) {
             clearInterval(timeid);
             vm.$nextTick(function () {
                 vm.moveAnimate = true;

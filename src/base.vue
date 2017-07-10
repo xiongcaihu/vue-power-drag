@@ -158,8 +158,8 @@
             font-size: 20px;
 
             position: relative;
-            margin-right:10px;
-            top:2px;
+            margin-right: 10px;
+            top: 2px;
         }
     }
 
