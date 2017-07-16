@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    <link rel="stylesheet" type="" href="./css/drag.css"> <!--在这里引入样式-->
+</head>
+
+<body>
+    <div id="app">
+        <vue-power-drag ref="drags" :your-list="list">
+            <template v-for="(item,index) in list" :slot="'slot'+index">
+            </template>
+        </vue-power-drag>
+    </div>
+</body>
+<script src="./js/jquery.js"></script> <!--在这里引入依赖的js-->
+<script src="./js/lodash.js"></script>
+<script src="./js/vue.js"></script>
+<script src="./js/vuePowerDrag.js"></script>
+
+<script>
+    var vm = new Vue({
+        el: "#app",
+        data: {
+            list: [{
+                x: 1,
+                y: 1,
+                sizex: 1,
+                sizey: 1
+            }]
+        },
+        mounted () {
+            this.$nextTick(()=>{
+                this.$refs['drags'].init();
+            })
+        }
+    })
+</script>
+
+</html>
