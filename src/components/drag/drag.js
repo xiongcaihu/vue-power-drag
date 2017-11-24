@@ -73,7 +73,9 @@ function addItemToPositionBox(item) {
 
     for (let i = item.x - 1; i < item.x - 1 + item.sizex; i++) {
         for (let j = item.y - 1; j < item.y - 1 + item.sizey; j++) {
-            pb[j][i].el = item;
+            if(pb[j][i]){
+                pb[j][i].el = item;
+            }
         }
     }
 }
@@ -103,7 +105,9 @@ function removeItemFromPositionBox(item) {
     if (item.x <= 0 || item.y <= 0) return;
     for (let i = item.x - 1; i < item.x - 1 + item.sizex; i++) {
         for (let j = item.y - 1; j < item.y - 1 + item.sizey; j++) {
-            pb[j][i].el = false;
+            if(pb[j][i]){
+                pb[j][i].el = false;
+            }
         }
     }
 }
@@ -210,16 +214,33 @@ function checkItemPosition(item, position) {
     position.x = position.x || item.x;
     position.y = position.y || item.y;
 
+    // 检查位置
     if (item.x < 1) {
         item.x = 1;
     }
 
+    // 检查大小
+    if (item.sizex > itemMaxX) {
+        item.sizex = itemMaxX;
+    }
+
+    if (item.sizex < 1) {
+        item.sizex = 1;
+    }
+
     if (item.x + item.sizex - 1 > itemMaxX) {
         item.x = itemMaxX - item.sizex + 1;
+        if (item.x < 1) {
+            item.x = 1;
+        }
     }
 
     if (item.y < 1) {
         item.y = 1;
+    }
+
+    if (item.sizey < 1) {
+        item.sizey = 1;
     }
 
     if (item.y + item.sizey > itemMaxY - 1) {
@@ -440,7 +461,7 @@ function canItemGoUp(item) {
     let upperRows = 0;
     for (let row = item.y - 2; row >= 0; row--) {
         for (let cell = item.x - 1; cell < item.x - 1 + item.sizex; cell++) {
-            if (positionBox[row][cell].el) {
+            if (positionBox[row][cell] && positionBox[row][cell].el) {
                 return upperRows;
             }
         }
@@ -511,7 +532,7 @@ function calcDiff(parent, son, size) {
         let temp_y = 0;
 
         for (let j = parent.y - 1 + parent.sizey; j < son.y - 1; j++) {
-            if (positionBox[j][i].el == false) {
+            if (positionBox[j][i] && positionBox[j][i].el == false) {
                 temp_y++;
             }
         }
@@ -553,11 +574,7 @@ function findBelowItems(item) {
     for (let cell = item.x - 1; cell < item.x - 1 + item.sizex; cell++) {
         for (let row = item.y - 1; row < positionBox.length; row++) {
             let target = positionBox[row][cell];
-            if (target == undefined) {
-                // console.log("row=%d,cell=%d", row, cell);
-                // console.dir(positionBox);
-            }
-            if (target.el) {
+            if (target && target.el) {
                 belowItems[target.el._dragId] = target.el;
                 break;
             }

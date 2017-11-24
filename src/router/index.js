@@ -5,6 +5,7 @@ import baseVue from '../base.vue'
 import chartVue from '../chart.vue'
 import power500 from '../power500.vue'
 import power1000 from '../power1000.vue'
+import test from '../test.vue'
 
 Vue.use(Router)
 
@@ -12,6 +13,9 @@ export default new Router({
     routes: [{
         path: '/',
         component: index
+    },{
+        path: '/test',
+        component: test
     }, {
         path: '/base',
         component: baseVue
