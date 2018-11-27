@@ -170,6 +170,19 @@ export default{
     同样，如果要指定xx元素作为缩放触发器，那么可以指定.resizeHandle类名
 ```
 
+##### 适配各个分辨率的屏幕
+可以参考 src/test.vue里的102行的做法。
+
+```bash
+    //屏幕适配，使得当前布局能在所有分辨率下适用，示例是在1366*638分辨率下完成
+    let screenWidth = window.innerWidth; // 当前屏幕的宽度
+    let screenHeight = window.innerHeight; // 当前屏幕的高度
+    this.baseWidth = 90.8333 * (screenWidth / 1366); // 假设这里我们设置vue-power-drag的最小单元格宽度为90.8333px，那么他在其他分辨率的屏幕上应该是该屏幕宽度与原本设置90.8333px的屏幕宽度的比值*90.83333
+    this.baseHeight = 100 * (screenHeight / 638); // 以此类推
+    this.baseMarginLeft = 20 * (screenWidth / 1366);
+    this.baseMarginTop = 20 * (screenHeight / 638);
+```
+
 ### TODO
 1. 继续完善文档
 2. 继续自己测试
